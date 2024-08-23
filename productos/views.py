@@ -1,18 +1,4 @@
 # views.py
-
-from django.shortcuts import render
-"""
-# Create your views here.
-from rest_framework import generics
-from .models import Producto
-from .serializers import ProductoSerializer
-
-class ProductoListCreate(generics.ListCreateAPIView):
-    queryset = Producto.objects.all()
-    serializer_class = ProductoSerializer
-"""
-# productos/views.py
-
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
