@@ -19,6 +19,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from .models import Producto
 from .serializers import ProductoSerializer
+from rest_framework import generics
 
 class ProductoCreateView(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -29,3 +30,8 @@ class ProductoCreateView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class ProductoListCreate(generics.ListCreateAPIView):
+    queryset = Producto.objects.all()
+    serializer_class = ProductoSerializer

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Productos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .product {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 200px;
+            text-align: center;
+            position: relative; /* Necesario para posicionar la imagen */
+        }
+        .product img {
+            max-width: 150px;
+            max-height: 150px;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            transition: transform 0.3s ease; /* Suaviza el zoom */
+            cursor: url('https://www.gstatic.com/webp/gallery/1.sm.png'), auto; /* Puntero tipo lupa */
+        }
+        .product img.enlarged {
+            transform: scale(1.5); /* Amplía la imagen al pasar el mouse */
+        }
+        .products-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        h2 {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        p {
+            margin: 3px 0;
+            color: #555;
+        }
+        .bold-text {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Productos Disponibles</h1>
+    <div id="products-container" class="products-container">
+        <!-- Los productos se mostrarán aquí -->
+    </div>
+    <script>
+        async function fetchProducts() {
+            try {
+                const response = await fetch('http://localhost:8000/api/productos/');
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                console.log('Productos recibidos:', data); // Log para verificar la respuesta
+                const productsContainer = document.getElementById('products-container');
+                productsContainer.innerHTML = ''; // Limpiar contenido existente
+                data.forEach(product => {
+                    const productDiv = document.createElement('div');
+                    productDiv.className = 'product';
+                    productDiv.innerHTML = `
+                        <img src="${product.imagen}" alt="Imagen de ${product.descripcion}" data-zoom="1">
+                        <h2>${product.descripcion}</h2>
+                        <p><span class="bold-text">C&oacutedigo:</span> ${product.codigo}</p>
+                        <p><span class="bold-text">Precio:</span> ${product.precio} RD$</p>
+                        <p><span class="bold-text">Tipo:</span> ${product.tipo}</p>
+                    `;
+                    productsContainer.appendChild(productDiv);
+                });
+            } catch (error) {
+                console.error('Error al obtener los productos:', error);
+            }
+        }
+
+        function handleZoom(event) {
+            const img = event.target;
+            if (img.tagName === 'IMG') {
+                let zoomLevel = parseFloat(img.getAttribute('data-zoom'));
+                if (event.deltaY < 0) {
+                    zoomLevel = Math.min(zoomLevel * 1.1, 3); // Limita el zoom máximo a 3x
+                } else {
+                    zoomLevel = Math.max(zoomLevel / 1.1, 1); // Limita el zoom mínimo a 1x
+                }
+                img.setAttribute('data-zoom', zoomLevel);
+                img.style.transform = `scale(${zoomLevel})`;
+                event.preventDefault(); // Previene el comportamiento de scroll por defecto
+            }
+        }
+
+        function resetZoom(img) {
+            img.style.transform = 'scale(1)'; // Restablece la imagen a su tamaño original
+            img.setAttribute('data-zoom', '1'); // Resetea el nivel de zoom
+            img.classList.remove('enlarged'); // Quita la clase de ampliación
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchProducts();
+
+            document.getElementById('products-container').addEventListener('mouseover', (event) => {
+                if (event.target.tagName === 'IMG') {
+                    const img = event.target;
+                    img.classList.add('enlarged');
+                    img.addEventListener('wheel', handleZoom, { passive: false });
+                }
+            });
+
+            document.getElementById('products-container').addEventListener('mouseout', (event) => {
+                if (event.target.tagName === 'IMG') {
+                    const img = event.target;
+                    img.removeEventListener('wheel', handleZoom, { passive: false });
+                    resetZoom(img); // Restablece la imagen al quitar el mouse
+                }
+            });
+        });
+    </script>
+</body>
+</html>
