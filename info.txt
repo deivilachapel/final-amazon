@@ -1,0 +1,13 @@
+Hice el deploy en el servidor Railway
+
+Trabajé con Django e incrusté el Código en Wix
+
+He trabajado solo
+
+Mi json es:
+
+https://final-api.up.railway.app/api/productos/
+
+Mi pagina en Wix :
+
+https://uasdmonografico56.wixsite.com/multimoda
